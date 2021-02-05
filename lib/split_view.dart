@@ -12,8 +12,12 @@ class SplitView extends StatefulWidget {
   final double gripSize;
   final double initialWeight;
   final Color gripColor;
-  final double positionLimit;
   final ValueChanged<double> onWeightChanged;
+  final bool dragHandle;
+  final IconData dragIcon;
+  double positionLimit;
+  double positionWeightLimit;
+  double positionWeightLowLimit;
 
   SplitView({
     @required this.view1,
@@ -23,8 +27,16 @@ class SplitView extends StatefulWidget {
     this.initialWeight = 0.5,
     this.gripColor = Colors.grey,
     this.positionLimit = 20.0,
+    this.dragHandle = false,
+    this.dragIcon = Icons.drag_handle_sharp , //drag_handle,
+    this.positionWeightLimit = 0,
+    this.positionWeightLowLimit = 0,
     this.onWeightChanged,
-  });
+  }) {
+    if( this.positionWeightLimit!=0 ) {
+      this.positionLimit = 0;
+    }
+  }
 
   @override
   State createState() => _SplitViewState();
@@ -76,11 +88,11 @@ class _SplitViewState extends State<SplitView> {
           top: 0,
           left: 0,
           right: 0,
-          bottom: bottom,
+          bottom: bottom - widget.gripSize / 2.0,
           child: widget.view1,
         ),
         Positioned(
-          top: top,
+          top: top + widget.gripSize / 2.0,
           left: 0,
           right: 0,
           bottom: 0,
@@ -97,14 +109,29 @@ class _SplitViewState extends State<SplitView> {
               behavior: HitTestBehavior.translucent,
               onVerticalDragUpdate: (detail) {
                 final RenderBox container =
-                    context.findRenderObject() as RenderBox;
+                context.findRenderObject() as RenderBox;
                 final pos = container.globalToLocal(detail.globalPosition);
-                if (pos.dy > widget.positionLimit &&
+                if( widget.positionWeightLowLimit!=0 ) {
+                  double posLimit = widget.positionWeightLimit*container.size.height;
+                  double posLowLimit = widget.positionWeightLowLimit*container.size.height;
+                  if (pos.dy > posLowLimit &&
+                      pos.dy < (container.size.height - posLimit)) {
+                    weight.value = pos.dy / container.size.height;
+                  }
+                } else if( widget.positionWeightLimit!=0 ) {
+                  double posLimit = widget.positionWeightLimit*container.size.height;
+                  if (pos.dy > posLimit &&
+                      pos.dy < (container.size.height - posLimit)) {
+                    weight.value = pos.dy / container.size.height;
+                  }
+                } else if (pos.dy > widget.positionLimit &&
                     pos.dy < (container.size.height - widget.positionLimit)) {
                   weight.value = pos.dy / container.size.height;
                 }
               },
-              child: Container(color: widget.gripColor),
+              child: Container(color: widget.gripColor,
+                child: widget.dragHandle ? Icon( widget.dragIcon, size:widget.gripSize ) :  null,  //drag_handle
+              ),
             ),
           ),
         ),
@@ -121,13 +148,13 @@ class _SplitViewState extends State<SplitView> {
         Positioned(
           top: 0,
           left: 0,
-          right: right,
+          right: right - widget.gripSize / 2.0,
           bottom: 0,
           child: widget.view1,
         ),
         Positioned(
           top: 0,
-          left: left,
+          left: left + widget.gripSize / 2.0,
           right: 0,
           bottom: 0,
           child: widget.view2,
@@ -143,14 +170,32 @@ class _SplitViewState extends State<SplitView> {
               behavior: HitTestBehavior.translucent,
               onVerticalDragUpdate: (detail) {
                 final RenderBox container =
-                    context.findRenderObject() as RenderBox;
+                context.findRenderObject() as RenderBox;
                 final pos = container.globalToLocal(detail.globalPosition);
-                if (pos.dx > widget.positionLimit &&
+                if( widget.positionWeightLowLimit!=0 ) {
+                  double posLimit = widget.positionWeightLimit*container.size.width;
+                  double posLowLimit = widget.positionWeightLowLimit*container.size.width;
+                  if (pos.dx > posLowLimit &&
+                      pos.dx < (container.size.width - posLimit)) {
+                    weight.value = pos.dx / container.size.width;
+                  }
+                } else if( widget.positionWeightLimit!=0 ) {
+                  double posLimit = widget.positionWeightLimit*container.size.width;
+                  if (pos.dx > posLimit &&
+                      pos.dx < (container.size.width - posLimit)) {
+                    weight.value = pos.dx / container.size.width;
+                  }
+                } else if (pos.dx > widget.positionLimit &&
                     pos.dx < (container.size.width - widget.positionLimit)) {
                   weight.value = pos.dx / container.size.width;
                 }
               },
-              child: Container(color: widget.gripColor),
+              child: Container(color: widget.gripColor,
+                child: !widget.dragHandle ? null : RotationTransition(
+                  child: Icon(widget.dragIcon, size:widget.gripSize*2),
+                  turns: AlwaysStoppedAnimation(0.25),
+                ),
+              ),
             ),
           ),
         ),
