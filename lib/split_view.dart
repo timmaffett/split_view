@@ -6,17 +6,29 @@ import 'package:flutter/widgets.dart';
 
 /// SplitView
 class SplitView extends StatefulWidget {
+  /// The top or left [Widget] for the [SplitView]
   final Widget view1;
+  /// The bottom or right [Widget] for the [SplitView]
   final Widget view2;
+  /// Specify vertical or horizontal using [SplitViewMode.Vertical] or [SplitViewMode.Horizontal]
   final SplitViewMode viewMode;
-  final double gripSize;
+  /// Initial weight of view1 (left or top) as a percentage of container width or height
   final double initialWeight;
+  /// Size of grip in pixels
+  final double gripSize;
+  /// Color of the [SplitView] grip (default is [Color.grey])
   final Color gripColor;
+  /// Optional callback to be called when [SplitView] is adjusted by user
   final ValueChanged<double> onWeightChanged;
+  /// Set [dragHandle] to true to include drag handle on grip, default is false
   final bool dragHandle;
+  /// Optionally set the [IconData] to use for the grip drag handle. Defaults to [Icons.drag_handle_sharp]
   final IconData dragIcon;
+  /// Pixel based [positionLimit] can be used to specify the top/bottom or left/right limits (from edge) in pixels for drag handle
   double positionLimit;
+  ///  Weight based [positionWeightLimit] can be used to specify the top/bottom or left/right limits (from edge) in %width/%height of container for drag handle
   double positionWeightLimit;
+  /// If Weight based [positionWeightLowLimit] is specified then this becomes the LEFT or TOP limit (from edge) as a %width/height, and [positionWeightLimit] will be used for RIGHT or BOTTOM (from edge) limit
   double positionWeightLowLimit;
 
   SplitView({
@@ -28,12 +40,13 @@ class SplitView extends StatefulWidget {
     this.gripColor = Colors.grey,
     this.positionLimit = 20.0,
     this.dragHandle = false,
-    this.dragIcon = Icons.drag_handle_sharp , //drag_handle,
+    this.dragIcon = Icons.drag_handle_sharp, //drag_handle,
     this.positionWeightLimit = 0,
     this.positionWeightLowLimit = 0,
     this.onWeightChanged,
   }) {
-    if( this.positionWeightLimit!=0 ) {
+    if( positionWeightLowLimit!=0 ) assert( positionWeightLimit!=0 );
+    if (this.positionWeightLimit != 0 || this.positionWeightLowLimit!=0) {
       this.positionLimit = 0;
     }
   }
@@ -78,7 +91,8 @@ class _SplitViewState extends State<SplitView> {
     );
   }
 
-  Stack _buildVerticalView(BuildContext context, BoxConstraints constraints, double w) {
+  Stack _buildVerticalView(
+      BuildContext context, BoxConstraints constraints, double w) {
     double top = constraints.maxHeight * w;
     double bottom = constraints.maxHeight * (1.0 - w);
 
@@ -109,17 +123,20 @@ class _SplitViewState extends State<SplitView> {
               behavior: HitTestBehavior.translucent,
               onVerticalDragUpdate: (detail) {
                 final RenderBox container =
-                context.findRenderObject() as RenderBox;
+                    context.findRenderObject() as RenderBox;
                 final pos = container.globalToLocal(detail.globalPosition);
-                if( widget.positionWeightLowLimit!=0 ) {
-                  double posLimit = widget.positionWeightLimit*container.size.height;
-                  double posLowLimit = widget.positionWeightLowLimit*container.size.height;
+                if (widget.positionWeightLowLimit != 0) {
+                  double posLimit =
+                      widget.positionWeightLimit * container.size.height;
+                  double posLowLimit =
+                      widget.positionWeightLowLimit * container.size.height;
                   if (pos.dy > posLowLimit &&
                       pos.dy < (container.size.height - posLimit)) {
                     weight.value = pos.dy / container.size.height;
                   }
-                } else if( widget.positionWeightLimit!=0 ) {
-                  double posLimit = widget.positionWeightLimit*container.size.height;
+                } else if (widget.positionWeightLimit != 0) {
+                  double posLimit =
+                      widget.positionWeightLimit * container.size.height;
                   if (pos.dy > posLimit &&
                       pos.dy < (container.size.height - posLimit)) {
                     weight.value = pos.dy / container.size.height;
@@ -129,8 +146,11 @@ class _SplitViewState extends State<SplitView> {
                   weight.value = pos.dy / container.size.height;
                 }
               },
-              child: Container(color: widget.gripColor,
-                child: widget.dragHandle ? Icon( widget.dragIcon, size:widget.gripSize ) :  null,  //drag_handle
+              child: Container(
+                color: widget.gripColor,
+                child: widget.dragHandle
+                    ? Icon(widget.dragIcon, size: widget.gripSize)
+                    : null, //drag_handle
               ),
             ),
           ),
@@ -139,7 +159,8 @@ class _SplitViewState extends State<SplitView> {
     );
   }
 
-  Widget _buildHorizontalView(BuildContext context, BoxConstraints constraints, double w) {
+  Widget _buildHorizontalView(
+      BuildContext context, BoxConstraints constraints, double w) {
     final double left = constraints.maxWidth * w;
     final double right = constraints.maxWidth * (1.0 - w);
 
@@ -170,17 +191,20 @@ class _SplitViewState extends State<SplitView> {
               behavior: HitTestBehavior.translucent,
               onVerticalDragUpdate: (detail) {
                 final RenderBox container =
-                context.findRenderObject() as RenderBox;
+                    context.findRenderObject() as RenderBox;
                 final pos = container.globalToLocal(detail.globalPosition);
-                if( widget.positionWeightLowLimit!=0 ) {
-                  double posLimit = widget.positionWeightLimit*container.size.width;
-                  double posLowLimit = widget.positionWeightLowLimit*container.size.width;
+                if (widget.positionWeightLowLimit != 0) {
+                  double posLimit =
+                      widget.positionWeightLimit * container.size.width;
+                  double posLowLimit =
+                      widget.positionWeightLowLimit * container.size.width;
                   if (pos.dx > posLowLimit &&
                       pos.dx < (container.size.width - posLimit)) {
                     weight.value = pos.dx / container.size.width;
                   }
-                } else if( widget.positionWeightLimit!=0 ) {
-                  double posLimit = widget.positionWeightLimit*container.size.width;
+                } else if (widget.positionWeightLimit != 0) {
+                  double posLimit =
+                      widget.positionWeightLimit * container.size.width;
                   if (pos.dx > posLimit &&
                       pos.dx < (container.size.width - posLimit)) {
                     weight.value = pos.dx / container.size.width;
@@ -190,11 +214,14 @@ class _SplitViewState extends State<SplitView> {
                   weight.value = pos.dx / container.size.width;
                 }
               },
-              child: Container(color: widget.gripColor,
-                child: !widget.dragHandle ? null : RotationTransition(
-                  child: Icon(widget.dragIcon, size:widget.gripSize*2),
-                  turns: AlwaysStoppedAnimation(0.25),
-                ),
+              child: Container(
+                color: widget.gripColor,
+                child: !widget.dragHandle
+                    ? null
+                    : RotationTransition(
+                        child: Icon(widget.dragIcon, size: widget.gripSize * 2),
+                        turns: AlwaysStoppedAnimation(0.25),
+                      ),
               ),
             ),
           ),
