@@ -8,11 +8,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Split_View Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Split_View Demo Page'),
     );
   }
 }
@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
           positionWeightLimit : 0.2,
           //dragIcon: Icons.drag_indicator,
           viewMode: SplitViewMode.Horizontal,
-          view1: Container(
+          view1:  Container(
             child: Center(child: Text("View1")),
             color: Colors.red,
           ),
