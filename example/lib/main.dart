@@ -35,7 +35,17 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: SplitView(
         initialWeight: 0.7,
+        dragHandle : true,
+        gripColor: Colors.white,
+        gripSize: 15,
+        //positionLimit: 200,
+        positionWeightLowLimit: 0.1,
+        positionWeightLimit : 0.3,
         view1: SplitView(
+          dragHandle : true,
+          positionWeightLowLimit: 0.1,
+          positionWeightLimit : 0.2,
+          //dragIcon: Icons.drag_indicator,
           viewMode: SplitViewMode.Horizontal,
           view1: Container(
             child: Center(child: Text("View1")),
