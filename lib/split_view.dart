@@ -8,26 +8,37 @@ import 'package:flutter/widgets.dart';
 class SplitView extends StatefulWidget {
   /// The top or left [Widget] for the [SplitView]
   final Widget view1;
+
   /// The bottom or right [Widget] for the [SplitView]
   final Widget view2;
+
   /// Specify vertical or horizontal using [SplitViewMode.Vertical] or [SplitViewMode.Horizontal]
   final SplitViewMode viewMode;
+
   /// Initial weight of view1 (left or top) as a percentage of container width or height
   final double initialWeight;
+
   /// Size of grip in pixels
   final double gripSize;
+
   /// Color of the [SplitView] grip (default is [Color.grey])
   final Color gripColor;
+
   /// Optional callback to be called when [SplitView] is adjusted by user
   final ValueChanged<double> onWeightChanged;
+
   /// Set [dragHandle] to true to include drag handle on grip, default is false
   final bool dragHandle;
+
   /// Optionally set the [IconData] to use for the grip drag handle. Defaults to [Icons.drag_handle_sharp]
   final IconData dragIcon;
+
   /// Pixel based [positionLimit] can be used to specify the top/bottom or left/right limits (from edge) in pixels for drag handle
   double positionLimit;
+
   ///  Weight based [positionWeightLimit] can be used to specify the top/bottom or left/right limits (from edge) in %width/%height of container for drag handle
   double positionWeightLimit;
+
   /// If Weight based [positionWeightLowLimit] is specified then this becomes the LEFT or TOP limit (from edge) as a %width/height, and [positionWeightLimit] will be used for RIGHT or BOTTOM (from edge) limit
   double positionWeightLowLimit;
 
@@ -63,13 +74,14 @@ class _SplitViewState extends State<SplitView> {
   @override
   void initState() {
     super.initState();
-    this.defaultWeight = widget.initialWeight;
+    this._prevWeight = this.defaultWeight = widget.initialWeight;
   }
 
   @override
   Widget build(BuildContext context) {
+    defaultWeight = _prevWeight;  // reset defaultWeight to _prevWeight so RE-Build() calls *WONT* RESET splitter
+
     weight = ValueNotifier(defaultWeight);
-    _prevWeight = defaultWeight;
 
     return LayoutBuilder(
       builder: (context, constraints) {
